@@ -38,4 +38,26 @@ private[master] class ApplicationSource(val application: ApplicationInfo) extend
     override def getValue: Int = application.coresGranted
   })
 
+  metricRegistry.register(MetricRegistry.name("cores_per_executor"), new Gauge[Int] {
+    override def getValue: Int = application.desc.coresPerExecutor.get
+  })
+
+  metricRegistry.register(MetricRegistry.name("max_cores"), new Gauge[Int] {
+    override def getValue: Int = application.desc.maxCores.get
+  })
+
+  metricRegistry.register(MetricRegistry.name("instances"), new Gauge[Int] {
+    val maxCores: Int = application.desc.maxCores.get
+    val coresPerExecutor: Int = application.desc.coresPerExecutor.get
+    override def getValue: Int = maxCores / coresPerExecutor
+  })
+
+  metricRegistry.register(MetricRegistry.name("requestExecutors"), new Gauge[Int] {
+    override def getValue: Int = application.executorLimit
+  })
+
+  metricRegistry.register(MetricRegistry.name("executors"), new Gauge[Int] {
+    override def getValue: Int = application.executors.size
+  })
+
 }
